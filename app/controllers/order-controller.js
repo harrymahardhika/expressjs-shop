@@ -31,7 +31,7 @@ router.post('/', allowedTo(permission.ADD_ORDER), async (req, res) => {
     }))
 
     await OrderItem.bulkCreate(orderItems, { transaction: t })
-    await Cart.destroy({ where: { userId: req.user.id } })
+    await Cart.destroy({ where: { userId: req.user.id } }, { transaction: t })
     await t.commit()
 
     res.json({ message: 'Order has been created' })
