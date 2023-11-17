@@ -6,6 +6,7 @@ const roleConstant = require('../constants/role')
 const validate = () => {
   const rules = [
     check('name').isLength({ min: 1 }),
+
     check('email')
       .isEmail()
       .custom(async (email) => {
@@ -15,7 +16,9 @@ const validate = () => {
           throw new Error('Email already in use')
         }
       }),
+
     check('password').isLength({ min: 6 }),
+
     check('passwordConfirmation').custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error('Password confirmation does not match password')
@@ -43,7 +46,7 @@ const validate = () => {
 router.post('/', validate(), async (req, res) => {
   const { name, email, password } = req.body
 
-  const role = await Role.findOne({ where: { name: roleConstant.ADMINISTRATOR } })
+  const role = await Role.findOne({ where: { name: roleConstant.CUSTOMER } })
 
   try {
     await User.create({

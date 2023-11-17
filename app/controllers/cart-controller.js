@@ -6,6 +6,7 @@ const permission = require('../constants/permission')
 
 const validateAddToCart = () => {
   const rules = [
+    // productId must be an integer, and must be a product that exists.
     check('productId')
       .isInt()
       .custom(async (productId, { req }) => {
@@ -15,6 +16,7 @@ const validateAddToCart = () => {
           throw new Error('Product not found')
         }
 
+        // The user can't add a product to their cart if it's already in their cart.
         const itemExistInCart = await Cart.findOne({
           where: { userId: req.user.id, productId }
         })
@@ -23,6 +25,8 @@ const validateAddToCart = () => {
           throw new Error('Product already in cart')
         }
       }),
+
+    // The quantity must be an integer greater than 0.
     check('quantity').isInt({ min: 1 })
   ]
 
@@ -42,6 +46,9 @@ const validateAddToCart = () => {
   ]
 }
 
+// This route will return all of the products in the cart for a logged in user.
+// It will only return the cart for the logged in user, and not for any other users.
+// It will also return the product information for each product in the cart.
 router.get('/', allowedTo(permission.VIEW_CART), async (req, res) => {
   const cart = await Cart.findAll({
     where: { userId: req.user.id },
@@ -51,6 +58,7 @@ router.get('/', allowedTo(permission.VIEW_CART), async (req, res) => {
   res.json(cart)
 })
 
+// Adds a product to the user's cart
 router.post('/', [validateAddToCart(), allowedTo(permission.ADD_TO_CART)], async (req, res) => {
   const { productId, quantity } = req.body
 
@@ -66,6 +74,7 @@ router.post('/', [validateAddToCart(), allowedTo(permission.ADD_TO_CART)], async
   res.json({ message: 'Product added to cart' })
 })
 
+// Deletes a product from the user's cart
 router.delete('/:id', allowedTo(permission.DELETE_CART_ITEM), async (req, res) => {
   const cart = await Cart.findByPk(req.params.id)
 

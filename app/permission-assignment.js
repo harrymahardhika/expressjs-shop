@@ -16,13 +16,18 @@ module.exports = {
   ],
 
   [role.CUSTOMER]: [
+    // PRODUCTS
     permission.BROWSE_PRODUCTS,
     permission.READ_PRODUCT,
 
+    // CART
+    permission.VIEW_CART,
+    permission.ADD_TO_CART,
+    permission.DELETE_CART_ITEM,
+
+    // ORDERS
     permission.BROWSE_ORDERS,
     permission.READ_ORDER,
-    permission.ADD_ORDER,
-
-    permission.ADD_TO_CART
+    permission.ADD_ORDER
   ]
 }
