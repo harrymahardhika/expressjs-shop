@@ -25,6 +25,7 @@ module.exports = {
         name: faker.commerce.productName(),
         price: faker.commerce.price(),
         description: faker.commerce.productDescription(),
+        imageUrl: faker.image.urlPicsumPhotos(),
         createdAt: new Date(),
         updatedAt: new Date()
       })
@@ -56,6 +57,7 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('CategoryProduct', null, {})
+
     await queryInterface.bulkDelete('Products', null, {})
     await queryInterface.bulkDelete('Categories', null, {})
   }

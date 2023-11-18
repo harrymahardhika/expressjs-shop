@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { Order, OrderItem, Cart, sequelize } = require('../models')
+const { Order, OrderItem, Cart, Product, sequelize } = require('../models')
 const allowedTo = require('../middlewares/permission')
 const permission = require('../constants/permission')
 
@@ -44,16 +44,41 @@ router.post('/', allowedTo(permission.ADD_ORDER), async (req, res) => {
 router.get('/', allowedTo(permission.BROWSE_ORDERS), async (req, res) => {
   const orders = await Order.findAll({
     where: { userId: req.user.id },
+    order: [['createdAt', 'DESC']],
     include: [
       {
         model: OrderItem,
         as: 'items',
-        include: ['product']
+        include: {
+          model: Product,
+          as: 'product'
+        }
       }
     ]
   })
 
   res.json(orders)
+})
+
+router.get('/:id', allowedTo(permission.READ_ORDER), async (req, res) => {
+  const order = await Order.findByPk(req.params.id, {
+    include: [
+      {
+        model: OrderItem,
+        as: 'items',
+        include: {
+          model: Product,
+          as: 'product'
+        }
+      }
+    ]
+  })
+
+  if (!order) {
+    return res.status(404).json({ error: 'Order not found' })
+  }
+
+  res.json(order.toJSON())
 })
 
 module.exports = router
